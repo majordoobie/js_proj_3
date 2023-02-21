@@ -1,7 +1,16 @@
+function createWorld() {
+
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    camera.position.z = 5;
+}
+
 /**
  * Function will create the initial objects of the world
  */
-function createWorld() {
+function createDemo() {
 
     // Create and add the transparent cube to the scene
     let cube = new THREE.Mesh(
@@ -54,9 +63,6 @@ function createWorld() {
         scene.add(ball.obj);
     }
 
-    controls = new THREE.TrackballControls(camera, canvasObj);  // note: TrackballControls require animation.
-    controls.noPan = true;   // Don't do panning with the right mouse button.
-    controls.noZoom = true;  // Don't do zooming with middle mouse button.
     return controls;
 
 }
@@ -68,6 +74,17 @@ function createWorld() {
 function updateForFrame() {
     let dt = clock.getDelta();  // time since last update
     for (let ball of balls) {
+        /* Create some balls and add them to the scene */
+        let geom = new THREE.SphereGeometry(2, 20, 12);  // Geometry will be reused for all the balls.
+
+        ball.obj = new THREE.Mesh(
+            geom,
+            new THREE.MeshPhongMaterial({
+                color: Math.floor(Math.random() * 0x1000000), // random color
+                specular: 0x080808,
+                shininess: 32
+            })
+        );
 
         /* update ball position based on ball velocity and elapsed time */
         ball.x += ball.dx * dt;

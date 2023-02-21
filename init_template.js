@@ -29,7 +29,6 @@ let controls;
  */
 function doFrame() {
     updateForFrame();
-    controls.update();
     renderer.render(scene, camera);
     requestAnimationFrame(doFrame);
 }
@@ -53,20 +52,21 @@ function initTemplate() {
 
         // Set basic Three.js objects
         scene = new THREE.Scene();
+        canvasObj = document.getElementById("mainCanvas");
         camera = new THREE.PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 100);
         try {
             renderer = new THREE.WebGLRenderer({
                 antialias: true,
+                canvas: canvasObj,
             });
         } catch (e) {
             document.body.innerHTML = "<h3><b>Sorry, WebGL is required but is not available.</b><h3>";
             return;
         }
 
-        canvasObj = renderer.domElement;
         renderer.setSize(window.innerWidth, window.innerHeight);
         window.addEventListener("resize", doResize, false);
-        document.body.appendChild(canvasObj);
+        // document.body.appendChild(canvasObj);
         clock = new THREE.Clock();
         renderer.setClearColor(0);
 
@@ -78,7 +78,11 @@ function initTemplate() {
         camera.add(light);
         scene.add(camera);
 
-        controls = createWorld();
+        // set default check
+        document.getElementById("wireframe").checked = true;
+        document.getElementById("multi").checked = true;
+        // createWorld();
+        createDemo()
 
         // Register callback for each frame
         requestAnimationFrame(doFrame);

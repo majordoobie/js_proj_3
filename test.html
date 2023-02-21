@@ -14,7 +14,6 @@
 	</style>
 	<script src="three.js"></script>
 	<script src="init_template.js"></script>
-	<script src="proj3.js"></script>
 	<script src="init_world.js"></script>
 
 	<script>
@@ -29,5 +28,17 @@
 </head>
 <body>
 
+<h2>Three.js: Using An Array of Materials</h2>
+
+<p><b>Use Arrow, PageUp, PageDown, and Home keys to rotate the models.</b></p>
+
+<p>
+	<label><input type="radio" name="material" id="white">White Material</label>
+	<label style="margin-left:25px"><input type="radio" name="material" id="multi">Array of Colored Materials</label>
+	<label style="margin-left:60px"><input type="checkbox" id="wireframe">Show Edges</label>
+</p>
+
+<div id="canvas-holder">
+	<canvas id="mainCanvas" width="600" height="300"></canvas>
+</div>
 </body>
-</html>
