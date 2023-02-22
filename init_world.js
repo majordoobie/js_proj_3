@@ -31,21 +31,22 @@ function createDemo() {
     let edgeGeometry = new THREE.EdgesGeometry(cube.geometry);  // contains edges of cube without diagonal edges
     cube.add(new THREE.LineSegments(edgeGeometry, new THREE.LineBasicMaterial({color: 0xffffff})));
 
-    /* Create some balls and add them to the scene */
-    let geom = new THREE.SphereGeometry(1, 20, 12);  // Geometry will be reused for all the balls.
+    // create the geo and material for each ball
+    let geom = new THREE.SphereGeometry(1, 20, 12);
+    
     for (let i = 0; i < BALL_COUNT; i++) {
-        let ball = {};  // object will contain a sphere plus its position and velocity info
+        let ball = {};
         balls.push(ball);
 
         ball.obj = new THREE.Mesh(
-            geom,
+            geom.clone(),
             new THREE.MeshPhongMaterial({
                 color: Math.floor(Math.random() * 0x1000000), // random color
                 specular: 0x080808,
                 shininess: 32
             })
         );
-
+        
         ball.x = 18 * Math.random() - 9;   // set random ball position
         ball.y = 18 * Math.random() - 9;
         ball.z = 18 * Math.random() - 9;
@@ -72,19 +73,13 @@ function createDemo() {
  * the actual animation manipulation will be placed
  */
 function updateForFrame() {
-    let dt = clock.getDelta();  // time since last update
+    let dt = clock.getDelta();
+    // let geom = new THREE.SphereGeometry(1, 20, 12);
+    let geom = new THREE.BoxGeometry(3, 3, 3);
     for (let ball of balls) {
-        /* Create some balls and add them to the scene */
-        let geom = new THREE.SphereGeometry(2, 20, 12);  // Geometry will be reused for all the balls.
 
-        ball.obj = new THREE.Mesh(
-            geom,
-            new THREE.MeshPhongMaterial({
-                color: Math.floor(Math.random() * 0x1000000), // random color
-                specular: 0x080808,
-                shininess: 32
-            })
-        );
+        ball.obj.geometry.dispose();
+        ball.obj.geometry = geom.clone();
 
         /* update ball position based on ball velocity and elapsed time */
         ball.x += ball.dx * dt;
