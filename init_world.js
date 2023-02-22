@@ -1,11 +1,8 @@
-function createWorld() {
+/*
+This file is a modified version of the full-window.html example.
+ */
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    camera.position.z = 5;
-}
+
 
 /**
  * Function will create the initial objects of the world
@@ -16,7 +13,7 @@ function createDemo() {
     let cube = new THREE.Mesh(
         new THREE.BoxGeometry(20, 20, 20),
         new THREE.MeshPhongMaterial({
-            polygonOffset: true,  // will make sure the edges are visible.
+            polygonOffset: true, 
             polygonOffsetUnits: 1,
             polygonOffsetFactor: 1,
             color: "white",
@@ -26,45 +23,42 @@ function createDemo() {
         })
     );
     scene.add(cube);
-
-    /* Create and add a wireframe cube to the scene, to show the edges of the cube. */
-    let edgeGeometry = new THREE.EdgesGeometry(cube.geometry);  // contains edges of cube without diagonal edges
+    let edgeGeometry = new THREE.EdgesGeometry(cube.geometry);
     cube.add(new THREE.LineSegments(edgeGeometry, new THREE.LineBasicMaterial({color: 0xffffff})));
 
-    // create the geo and material for each ball
-    let geom = new THREE.SphereGeometry(1, 20, 12);
-    
-    for (let i = 0; i < SHAPE_COUNT; i++) {
-        let ball = {};
-        shapes.push(ball);
+    let geom = GeometryArray[Number(document.getElementById("shapeDiv").value)];
+    currentSpeed = shapeSpeed[Number(document.getElementById("speedDiv").value)];
 
-        ball.obj = new THREE.Mesh(
+    // create the geo and material for each
+    for (let i = 0; i < SHAPE_COUNT; i++) {
+        let shape = {};
+        shapes.push(shape);
+
+        shape.obj = new THREE.Mesh(
             geom.clone(),
             new THREE.MeshPhongMaterial({
-                color: Math.floor(Math.random() * 0x1000000), // random color
+                color: Math.floor(Math.random() * 0x1000000), 
                 specular: 0x080808,
                 shininess: 32
             })
         );
         
-        ball.x = 18 * Math.random() - 9;   // set random ball position
-        ball.y = 18 * Math.random() - 9;
-        ball.z = 18 * Math.random() - 9;
-        ball.dx = Math.random() * 6 + 2;  // set random ball velocity, in units per second
-        ball.dy = Math.random() * 6 + 2;
-        ball.dz = Math.random() * 6 + 2;
+        shape.x = 18 * Math.random() - 9;
+        shape.y = 18 * Math.random() - 9;
+        shape.z = 18 * Math.random() - 9;
+        shape.dx = Math.random() * 6 + 2;
+        shape.dy = Math.random() * 6 + 2;
+        shape.dz = Math.random() * 6 + 2;
         if (Math.random() < 0.5)
-            ball.dx = -ball.dx;
+            shape.dx = -shape.dx;
         if (Math.random() < 0.5)
-            ball.dy = -ball.dy;
+            shape.dy = -shape.dy;
         if (Math.random() < 0.5)
-            ball.dz = -ball.dz;
+            shape.dz = -shape.dz;
 
-        ball.obj.position.set(ball.x, ball.y, ball.z);
-        scene.add(ball.obj);
+        shape.obj.position.set(shape.x, shape.y, shape.z);
+        scene.add(shape.obj);
     }
-
-    return controls;
 
 }
 
@@ -73,42 +67,72 @@ function createDemo() {
  * the actual animation manipulation will be placed
  */
 function updateForFrame() {
-    let dt = clock.getDelta();
-    // let geom = new THREE.SphereGeometry(1, 20, 12);
-    let geom = new THREE.BoxGeometry(3, 3, 3);
-    for (let ball of shapes) {
+    
+    // Grab the first item from the "queue" to see if there is anything in there
+    let geoms = shapeQueue.shift();
+    let speedMod = speedQueue.shift();
+    let updateShapes = false;
 
-        ball.obj.geometry.dispose();
-        ball.obj.geometry = geom.clone();
+    if (undefined !== geoms)
+    {
+        // If there is a new update, then perform
+        currentShape = geoms;
+        updateShapes = true;
+    }
+    
+    if (undefined !== speedMod)
+    {
+        currentSpeed = speedMod;
+    }
+    
+    let dt = clock.getDelta() * currentSpeed;
+    
+    for (let shape of shapes) {
+
+        if (updateShapes)
+        {
+            shape.obj.geometry.dispose();
+            shape.obj.geometry = currentShape.clone();
+        }
 
         /* update ball position based on ball velocity and elapsed time */
-        ball.x += ball.dx * dt;
-        ball.y += ball.dy * dt;
-        ball.z += ball.dz * dt;
+        shape.x += shape.dx * dt;
+        shape.y += shape.dy * dt;
+        shape.z += shape.dz * dt;
 
         /* if ball has moved outside the cube, reflect it back into the cube */
-        if (ball.x > 9) {
-            ball.x -= 2 * (ball.x - 9);
-            ball.dx = -Math.abs(ball.dx);
-        } else if (ball.x < -9) {
-            ball.x += 2 * (-9 - ball.x);
-            ball.dx = Math.abs(ball.dx);
+        if (shape.x > 9) {
+            shape.x -= 2 * (shape.x - 9);
+            shape.dx = -Math.abs(shape.dx);
+        } else if (shape.x < -9) {
+            shape.x += 2 * (-9 - shape.x);
+            shape.dx = Math.abs(shape.dx);
         }
-        if (ball.y > 9) {
-            ball.y -= 2 * (ball.y - 9);
-            ball.dy = -Math.abs(ball.dy);
-        } else if (ball.y < -9) {
-            ball.y += 2 * (-9 - ball.y);
-            ball.dy = Math.abs(ball.dy);
+        if (shape.y > 9) {
+            shape.y -= 2 * (shape.y - 9);
+            shape.dy = -Math.abs(shape.dy);
+        } else if (shape.y < -9) {
+            shape.y += 2 * (-9 - shape.y);
+            shape.dy = Math.abs(shape.dy);
         }
-        if (ball.z > 9) {
-            ball.z -= 2 * (ball.z - 9);
-            ball.dz = -Math.abs(ball.dz);
-        } else if (ball.z < -9) {
-            ball.z += 2 * (-9 - ball.z);
-            ball.dz = Math.abs(ball.dz);
+        if (shape.z > 9) {
+            shape.z -= 2 * (shape.z - 9);
+            shape.dz = -Math.abs(shape.dz);
+        } else if (shape.z < -9) {
+            shape.z += 2 * (-9 - shape.z);
+            shape.dz = Math.abs(shape.dz);
         }
 
-        ball.obj.position.set(ball.x, ball.y, ball.z);
+        shape.obj.position.set(shape.x, shape.y, shape.z);
     }
+}
+
+function onShapeSelect() {
+    shapeQueue.push(GeometryArray[Number(document.getElementById("shapeDiv").value)]);
+    
+}
+
+function onSpeedSelect() {
+    console.log("Ami here?");
+    speedQueue.push(shapeSpeed[Number(document.getElementById("speedDiv").value)]);
 }

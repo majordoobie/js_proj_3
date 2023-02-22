@@ -7,7 +7,6 @@
 			margin: 0; /* Make sure that there is no margin around the canvas */
 			overflow: hidden; /* Make sure we don't get scroll bars. */
 		}
-
 		canvas {
 			display: block; /* The default display, inline, would add small margin below the canvas */
 		}
@@ -19,8 +18,7 @@
 	<script>
 		"use strict";
 
-		let shapes = [];
-		const SHAPE_COUNT = 50;
+		const SHAPE_COUNT = 150;
 
 		// Register the function callback when everything is loaded
 		window.onload = initTemplate;
@@ -28,17 +26,29 @@
 </head>
 <body>
 
-<h2>Three.js: Using An Array of Materials</h2>
-
-<p><b>Use Arrow, PageUp, PageDown, and Home keys to rotate the models.</b></p>
+<h2>Project 3</h2>
 
 <p>
-	<label><input type="radio" name="material" id="white">White Material</label>
-	<label style="margin-left:25px"><input type="radio" name="material" id="multi">Array of Colored Materials</label>
-	<label style="margin-left:60px"><input type="checkbox" id="wireframe">Show Edges</label>
+<p><label><b>Select Shape: </b><select id="shapeDiv">
+	<option value="0">Sphere</option>
+	<option value="1">Cube</option>
+	<option value="2">Cone</option>
+	<option value="3">Cylinder</option>
+	<option value="4">Dodecahedron</option>
+	<option value="5">Torus Knot</option>
+</select></label>
+</p>
+
+<p>
+<p><label><b>Select Speed: </b><select id="speedDiv">
+	<option value="0">Slow</option>
+	<option value="1">Medium</option>
+	<option value="2">Fast</option>
+	<option value="3">Wild</option>
+</select></label>
 </p>
 
 <div id="canvas-holder">
-	<canvas id="mainCanvas" width="600" height="300"></canvas>
+	<canvas id="mainCanvas" width="640" height="480"></canvas>
 </div>
 </body>

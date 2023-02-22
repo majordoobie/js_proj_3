@@ -1,5 +1,7 @@
 /**
- * This file has been taken and repurposed from the reading material from source code: full window demo
+ * This file has been taken and repurposed from the reading material from source code: full window demo along with
+ * demo.html with the cube. I mainly restructured the code to allow me to modify the shapes and its speed without
+ * any memory leaks.
  */
 
 "use strict";
@@ -20,8 +22,38 @@ let canvasObj;
 // Keeps track of elapsed time of animation.
 let clock;
 
-// an object of type TrackballControls, the handles rotation using the mouse.
-let controls;  
+// array of total shapes created
+let shapes = [];
+
+// Control the shape changes
+let shapeQueue = [];
+let currentShape;
+const Geometries = {
+    sphere: 0,
+    cube: 1,
+    cone: 2,
+    cylinder: 3,
+    dodecahedron: 4,
+    torusKnot: 5,
+};
+const GeometryArray = [
+    new THREE.SphereGeometry(1, 20, 12),
+    new THREE.BoxGeometry(3, 3, 3),
+    new THREE.ConeGeometry(1, 2),
+    new THREE.CylinderGeometry(1, 1, 1.3, 32),
+    new THREE.DodecahedronGeometry(),
+    new THREE.TorusKnotGeometry(.8, 0.2, 128, 8, 5, 8),
+];
+
+// Control the speed of the shapes
+let currentSpeed;
+let speedQueue = [];
+const shapeSpeed = [
+    .5,
+    1,
+    1.5,
+    3
+];
 
 
 /**
@@ -40,7 +72,7 @@ function doFrame() {
  */
 function doResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix(); // Need to call this for the change in aspect to take effect.
+    camera.updateProjectionMatrix(); 
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
@@ -50,7 +82,6 @@ function doResize() {
 function initTemplate() {
     try {
 
-        // Set basic Three.js objects
         scene = new THREE.Scene();
         canvasObj = document.getElementById("mainCanvas");
         camera = new THREE.PerspectiveCamera(28, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -78,11 +109,15 @@ function initTemplate() {
         camera.add(light);
         scene.add(camera);
 
-        // set default check
-        document.getElementById("wireframe").checked = true;
-        document.getElementById("multi").checked = true;
-        // createWorld();
         createDemo()
+        
+        // Set the default values for the page
+        document.getElementById("shapeDiv").value = "0";
+        document.getElementById("shapeDiv").onchange = onShapeSelect;
+        
+        document.getElementById("speedDiv").value = "0";
+        document.getElementById("speedDiv").onchange = onSpeedSelect;
+
 
         // Register callback for each frame
         requestAnimationFrame(doFrame);
