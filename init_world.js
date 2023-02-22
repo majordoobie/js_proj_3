@@ -34,9 +34,9 @@ function createDemo() {
     // create the geo and material for each ball
     let geom = new THREE.SphereGeometry(1, 20, 12);
     
-    for (let i = 0; i < BALL_COUNT; i++) {
+    for (let i = 0; i < SHAPE_COUNT; i++) {
         let ball = {};
-        balls.push(ball);
+        shapes.push(ball);
 
         ball.obj = new THREE.Mesh(
             geom.clone(),
@@ -76,7 +76,7 @@ function updateForFrame() {
     let dt = clock.getDelta();
     // let geom = new THREE.SphereGeometry(1, 20, 12);
     let geom = new THREE.BoxGeometry(3, 3, 3);
-    for (let ball of balls) {
+    for (let ball of shapes) {
 
         ball.obj.geometry.dispose();
         ball.obj.geometry = geom.clone();
